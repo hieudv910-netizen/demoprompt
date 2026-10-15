@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StudyPlan - Quản lý kế hoạch học tập</title>
+<style>
+:root{--bg:#f5f6ff;--card:#fff;--text:#1e2140;--muted:#6b6f8f;--pri:#5b6cf0;--pri2:#8b5cf6;--line:#e3e5f5;--danger:#e5484d;--warn:#c27c00;--ok:#2f9e6b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12132a;--card:#1b1d3a;--text:#eceefc;--muted:#9a9fc8;--pri:#7c8bff;--pri2:#a78bfa;--line:#2c2f55;--danger:#ff6b70;--warn:#f0b13a;--ok:#4cc38a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12132a;--card:#1b1d3a;--text:#eceefc;--muted:#9a9fc8;--pri:#7c8bff;--pri2:#a78bfa;--line:#2c2f55;--danger:#ff6b70;--warn:#f0b13a;--ok:#4cc38a;color-scheme:dark}
+*{box-sizing:border-box}html{height:100%}body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{display:flex;min-height:100vh}
+aside{width:220px;background:var(--card);border-right:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.logo{font-weight:700;font-size:18px;padding:4px 10px 14px;background:linear-gradient(90deg,var(--pri),var(--pri2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav{border:0;background:none;color:var(--muted);text-align:left;padding:10px 12px;border-radius:10px;cursor:pointer;font:inherit;transition:.2s}
+.nav:hover{background:var(--bg)}.nav.on{background:linear-gradient(90deg,var(--pri),var(--pri2));color:#fff}
+.sp{flex:1}
+main{flex:1;padding:24px;max-width:1100px;min-width:0;animation:fade .3s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{margin:0 0 16px;font-size:22px}h3{margin:0 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.grid{display:grid;gap:14px}.g4{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.stat b{display:block;font-size:26px}.stat span{color:var(--muted);font-size:13px}
+button.b{border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 14px;border-radius:10px;cursor:pointer;font:inherit;transition:.15s}
+button.b:hover{border-color:var(--pri)}button.p{background:linear-gradient(90deg,var(--pri),var(--pri2));color:#fff;border:0}
+button.d{color:var(--danger)}button.s{padding:4px 10px;font-size:13px}
+input,select,textarea{width:100%;padding:9px 11px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);font:inherit}
+label{display:block;font-size:13px;color:var(--muted);margin:10px 0 3px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}.bar input,.bar select{width:auto;flex:1;min-width:120px}
+.row{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:8px;flex-wrap:wrap}
+.row .m{flex:1;min-width:160px}.row small{color:var(--muted)}
+.chip{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;color:#fff;margin-right:4px}
+.tag{font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.tag.r{color:var(--danger);border-color:var(--danger)}.tag.w{color:var(--warn);border-color:var(--warn)}.tag.g{color:var(--ok);border-color:var(--ok)}
+.chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--line);background:none;cursor:pointer;color:#fff;font-size:13px}
+.chk.doing{border-color:var(--warn)}.chk.done{background:var(--ok);border-color:var(--ok)}
+.done .t{text-decoration:line-through;opacity:.6}
+.prog{height:10px;background:var(--bg);border-radius:9px;overflow:hidden;margin-top:8px}.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--pri),var(--pri2));transition:width .4s}
+.empty{text-align:center;color:var(--muted);padding:28px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.cal .h{text-align:center;color:var(--muted);font-size:12px;padding:4px}
+.cell{min-height:84px;border:1px solid var(--line);border-radius:8px;padding:4px;background:var(--card);overflow:hidden;font-size:11px}
+.cell.dim{opacity:.45}.cell.today{border-color:var(--pri);box-shadow:0 0 0 1px var(--pri)}.cell b{font-size:12px}
+.cell .e{display:block;border-radius:4px;padding:0 4px;margin-top:2px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.timer{font-size:64px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums;margin:10px 0}
+.scroll{overflow-x:auto}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--text);width:min(440px,92vw);padding:20px}
+dialog::backdrop{background:rgba(10,10,30,.5)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:99px;z-index:50}
+@media(max-width:760px){
+ .app{flex-direction:column}
+ aside{position:fixed;bottom:0;left:0;right:0;top:auto;width:100%;height:auto;flex-direction:row;overflow-x:auto;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));z-index:20;border-top:1px solid var(--line);border-right:0}
+ .logo,.sp,.side-x{display:none}.nav{padding:8px 10px;white-space:nowrap;font-size:13px}
+ main{padding:16px 12px 90px}.cell{min-height:60px}.timer{font-size:48px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+ <div class="logo">📚 StudyPlan</div>
+ <button class="nav" data-a="nav" data-id="dash">Dashboard</button>
+ <button class="nav" data-a="nav" data-id="tasks">Nhiệm vụ</button>
+ <button class="nav" data-a="nav" data-id="cal">Lịch</button>
+ <button class="nav" data-a="nav" data-id="subj">Môn học</button>
+ <button class="nav" data-a="nav" data-id="goals">Mục tiêu</button>
+ <button class="nav" data-a="nav" data-id="pomo">Pomodoro</button>
+ <div class="sp"></div>
+ <button class="nav side-x" data-a="theme">🌓 Sáng / Tối</button>
+ <button class="nav side-x" data-a="export">⬇ Xuất JSON</button>
+ <button class="nav side-x" data-a="import">⬆ Nhập JSON</button>
+ <input type="file" id="file" accept=".json" hidden>
+</aside>
+<main id="main"></main>
+</div>
+<dialog id="dlg"><h3 id="dt"></h3><div id="db"></div><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:16px"><button class="b" data-a="close">Hủy</button><button class="b p" data-a="ok">Lưu</button></div><div id="err" style="color:var(--danger);font-size:13px;margin-top:8px"></div></dialog>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+/* ===== Tiện ích ===== */
+const $=s=>document.querySelector(s), KEY='studyplan.v1';
+const uid=()=>Math.random().toString(36).slice(2,9);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const dd=s=>new Date(s+'T00:00'); const addD=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const today=()=>fmt(new Date()); const monday=d=>{const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));x.setHours(0,0,0,0);return x};
+const DAYS=['Thứ 2','Thứ 3','Thứ 4','Thứ 5','Thứ 6','Thứ 7','CN'];
+const PR={high:'Cao',mid:'Trung bình',low:'Thấp'}, ST={todo:'Chưa làm',doing:'Đang làm',done:'Hoàn thành'};
+const PALETTE=['#5b6cf0','#8b5cf6','#0ea5a4','#e0709b','#d98a00'];
+
+/* ===== Dữ liệu & lưu trữ (localStorage) ===== */
+function seed(){
+ const s=[{id:'s1',name:'Cấu trúc dữ liệu',teacher:'TS. Nguyễn Văn An',credits:3,color:'#5b6cf0',day:'0',time:'07:30',note:''},
+  {id:'s2',name:'Cơ sở dữ liệu',teacher:'ThS. Trần Thị Bình',credits:3,color:'#8b5cf6',day:'2',time:'13:30',note:''},
+  {id:'s3',name:'Tiếng Anh chuyên ngành',teacher:'Cô Lê Hoa',credits:2,color:'#0ea5a4',day:'4',time:'09:30',note:''}];
+ const T=[['Bài tập chương 3: Cây nhị phân','s1',1,'high','doing'],['Ôn tập giữa kỳ CTDL','s1',6,'high','todo'],['Thiết kế ERD cho đồ án','s2',3,'mid','doing'],
+  ['Viết truy vấn SQL nâng cao','s2',-1,'high','todo'],['Nộp báo cáo nhóm','s2',9,'mid','todo'],['Học 30 từ vựng mới','s3',2,'low','todo'],
+  ['Bài thuyết trình Unit 5','s3',5,'mid','todo'],['Đọc tài liệu tuần 1','s1',-3,'low','done']];
+ const tasks=T.map((t,i)=>({id:'t'+i,title:t[0],desc:'',subject:t[1],due:fmt(addD(new Date(),t[2])),priority:t[3],status:t[4],note:''}));
+ const M=[60,90,45,120,30,75,50];
+ const sessions=M.map((m,i)=>({id:'x'+i,date:fmt(addD(new Date(),i-6)),minutes:m,subject:s[i%3].id}));
+ return {subjects:s,tasks,sessions,goals:[{id:'g1',title:'Học 15 giờ mỗi tuần',hours:15,scope:'week'},{id:'g2',title:'Tổng 120 giờ học kỳ',hours:120,scope:'term'}],theme:''};
+}
+let S; try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){S=null} if(!S||!S.subjects)S=seed();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const subj=id=>S.subjects.find(x=>x.id===id)||{name:'(Chưa có môn)',color:'#888'};
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2200)}
+
+/* ===== Hộp thoại biểu mẫu dùng chung ===== */
+let dlgOk=null,dlgFields=[];
+function openForm(title,fields,vals,onSave){
+ dlgFields=fields;dlgOk=onSave;$('#dt').textContent=title;$('#err').textContent='';
+ $('#db').innerHTML=fields.map(f=>{const v=vals[f.k]??'';let i;
+  if(f.t==='select')i=`<select id="f_${f.k}">${f.o.map(o=>`<option value="${esc(o[0])}" ${String(o[0])===String(v)?'selected':''}>${esc(o[1])}</option>`).join('')}</select>`;
+  else if(f.t==='area')i=`<textarea id="f_${f.k}" rows="3">${esc(v)}</textarea>`;
+  else i=`<input id="f_${f.k}" type="${f.t||'text'}" value="${esc(v)}" ${f.min!=null?`min="${f.min}"`:''}>`;
+  return `<label>${f.l}${f.r?' *':''}</label>${i}`}).join('');
+ $('#dlg').showModal();
+}
+function submitForm(){
+ const o={};
+ for(const f of dlgFields){let v=$('#f_'+f.k).value.trim();
+  if(f.r&&!v)return $('#err').textContent=`Vui lòng nhập "${f.l}".`;
+  if(f.t==='date'&&v&&isNaN(dd(v)))return $('#err').textContent='Ngày không hợp lệ.';
+  if(f.t==='number'){v=Number(v);if(!(v>0))return $('#err').textContent=`"${f.l}" phải lớn hơn 0.`}
+  o[f.k]=v}
+ dlgOk(o);$('#dlg').close();save();render();
+}
+const subOpts=()=>S.subjects.map(s=>[s.id,s.name]);
+
+/* ===== Điều hướng & render ===== */
+let view='dash',charts=[],F={q:'',sub:'',st:'',pr:'',sort:'due'},cal={mode:'month',ref:new Date()};
+function render(){
+ document.documentElement.dataset.theme=S.theme||'';
+ document.querySelectorAll('.nav[data-a=nav]').forEach(b=>b.classList.toggle('on',b.dataset.id===view));
+ charts.forEach(c=>c.destroy());charts=[];
+ $('#main').innerHTML=({dash:vDash,tasks:vTasks,cal:vCal,subj:vSubj,goals:vGoals,pomo:vPomo})[view]();
+ if(view==='dash')drawCharts();
+}
+const hours=m=>(m/60).toFixed(1);
+function weekMin(){const a=fmt(monday(new Date())),b=fmt(addD(monday(new Date()),6));return S.sessions.filter(x=>x.date>=a&&x.date<=b).reduce((n,x)=>n+x.minutes,0)}
+function dueBadge(t){if(t.status==='done')return '';const d=Math.round((dd(t.due)-dd(today()))/864e5);
+ if(d<0)return '<span class="tag r">Quá hạn</span>';if(d===0)return '<span class="tag w">Hôm nay</span>';if(d<=3)return `<span class="tag w">Còn ${d} ngày</span>`;return ''}
+
+/* ===== Dashboard ===== */
+function vDash(){
+ const n=S.tasks.length,dn=S.tasks.filter(t=>t.status==='done').length;
+ const soon=S.tasks.filter(t=>t.status!=='done'&&dueBadge(t)).sort((a,b)=>a.due.localeCompare(b.due));
+ return `<h1>Dashboard</h1><div class="grid g4">
+ <div class="card stat"><b>${n}</b><span>Tổng nhiệm vụ</span></div>
+ <div class="card stat"><b>${n?Math.round(dn/n*100):0}%</b><span>Tỷ lệ hoàn thành</span></div>
+ <div class="card stat"><b>${hours(weekMin())}h</b><span>Giờ học tuần này</span></div>
+ <div class="card stat"><b style="color:var(--danger)">${soon.length}</b><span>Sắp đến hạn / quá hạn</span></div></div>
+ <div class="grid g2" style="margin-top:14px"><div class="card"><h3>Giờ học 7 ngày qua</h3><canvas id="c1" height="200"></canvas></div>
+ <div class="card"><h3>Phân bổ theo môn học</h3><canvas id="c2" height="200"></canvas></div></div>
+ <div class="card" style="margin-top:14px"><h3>⏰ Nhắc nhở deadline</h3>${soon.length?soon.map(t=>`<div style="padding:4px 0">${dueBadge(t)} <b>${esc(t.title)}</b> <small style="color:var(--muted)">· ${esc(subj(t.subject).name)} · ${t.due}</small></div>`).join(''):'<div class="empty">Không có deadline gấp. Tuyệt vời! 🎉</div>'}</div>`;
+}
+function drawCharts(){
+ const css=getComputedStyle(document.documentElement);Chart.defaults.color=css.getPropertyValue('--muted');Chart.defaults.borderColor=css.getPropertyValue('--line');
+ const days=[...Array(7)].map((_,i)=>fmt(addD(new Date(),i-6)));
+ charts.push(new Chart($('#c1'),{type:'bar',data:{labels:days.map(d=>d.slice(8)+'/'+d.slice(5,7)),datasets:[{label:'Giờ học',data:days.map(d=>+hours(S.sessions.filter(x=>x.date===d).reduce((n,x)=>n+x.minutes,0))),backgroundColor:css.getPropertyValue('--pri'),borderRadius:6}]},options:{plugins:{legend:{display:false}}}}));
+ const by=S.subjects.map(s=>S.sessions.filter(x=>x.subject===s.id).reduce((n,x)=>n+x.minutes,0));
+ charts.push(new Chart($('#c2'),{type:'doughnut',data:{labels:S.subjects.map(s=>s.name),datasets:[{data:by.map(m=>+hours(m)),backgroundColor:S.subjects.map(s=>s.color),borderWidth:0}]},options:{plugins:{legend:{position:'bottom'}}}}));
+}
+
+/* ===== Nhiệm vụ ===== */
+function taskList(){
+ const q=F.q.toLowerCase();
+ let L=S.tasks.filter(t=>(!q||(t.title+t.desc+t.note).toLowerCase().includes(q))&&(!F.sub||t.subject===F.sub)&&(!F.st||t.status===F.st)&&(!F.pr||t.priority===F.pr));
+ const w={high:0,mid:1,low:2};
+ L.sort((a,b)=>F.sort==='pr'?w[a.priority]-w[b.priority]:F.sort==='st'?a.status.localeCompare(b.status):a.due.localeCompare(b.due));
+ if(!L.length)return `<div class="empty">${S.tasks.length?'Không tìm thấy nhiệm vụ phù hợp.':'Chưa có nhiệm vụ nào. Bấm “+ Thêm nhiệm vụ” để bắt đầu!'}</div>`;
+ return L.map(t=>{const s=subj(t.subject);return `<div class="row ${t.status}">
+  <button class="chk ${t.status}" data-a="cyc" data-id="${t.id}" title="${ST[t.status]}">${t.status==='done'?'✓':''}</button>
+  <div class="m"><div class="t"><b>${esc(t.title)}</b></div><small><span class="chip" style="background:${s.color}">${esc(s.name)}</span>Hạn ${t.due} · ${PR[t.priority]} · ${ST[t.status]}</small>${t.note?`<div><small>📝 ${esc(t.note)}</small></div>`:''}</div>
+  ${dueBadge(t)}<button class="b s" data-a="editT" data-id="${t.id}">Sửa</button><button class="b s d" data-a="delT" data-id="${t.id}">Xóa</button></div>`}).join('');
+}
+function vTasks(){
+ const o=(a,k)=>a.map(x=>`<option value="${x[0]}" ${F[k]===x[0]?'selected':''}>${x[1]}</option>`).join('');
+ return `<h1>Nhiệm vụ</h1><div class="bar"><input id="q" placeholder="🔍 Tìm kiếm..." value="${esc(F.q)}">
+ <select data-f="sub"><option value="">Mọi môn</option>${o(subOpts(),'sub')}</select>
+ <select data-f="st"><option value="">Mọi trạng thái</option>${o(Object.entries(ST),'st')}</select>
+ <select data-f="pr"><option value="">Mọi ưu tiên</option>${o(Object.entries(PR),'pr')}</select>
+ <select data-f="sort">${o([['due','Theo hạn nộp'],['pr','Theo ưu tiên'],['st','Theo trạng thái']],'sort')}</select>
+ <button class="b p" data-a="addT">+ Thêm nhiệm vụ</button></div><div id="tl">${taskList()}</div>`;
+}
+const taskFields=()=>[{k:'title',l:'Tiêu đề',r:1},{k:'desc',l:'Mô tả',t:'area'},{k:'subject',l:'Môn học',t:'select',o:subOpts()},{k:'due',l:'Hạn nộp',t:'date',r:1},
+ {k:'priority',l:'Mức ưu tiên',t:'select',o:Object.entries(PR)},{k:'status',l:'Trạng thái',t:'select',o:Object.entries(ST)},{k:'note',l:'Ghi chú nhanh',t:'area'}];
+
+/* ===== Lịch (tuần / tháng) ===== */
+function vCal(){
+ const r=cal.ref,wk=cal.mode==='week';let start,count,title;
+ if(wk){start=monday(r);count=7;title='Tuần '+fmt(start).split('-').reverse().slice(0,2).join('/')}
+ else{start=monday(new Date(r.getFullYear(),r.getMonth(),1));count=42;title='Tháng '+(r.getMonth()+1)+'/'+r.getFullYear()}
+ let cells='';for(let i=0;i<count;i++){const d=addD(start,i),k=fmt(d),wd=i%7;
+  const cls=S.subjects.filter(s=>s.day===String(wd)).map(s=>`<span class="e" style="background:${s.color}">${esc(s.time)} ${esc(s.name)}</span>`).join('');
+  const ts=S.tasks.filter(t=>t.due===k).map(t=>`<span class="e" style="background:${t.status==='done'?'var(--ok)':'var(--danger)'}">⚑ ${esc(t.title)}</span>`).join('');
+  cells+=`<div class="cell ${!wk&&d.getMonth()!==r.getMonth()?'dim':''} ${k===today()?'today':''}"><b>${d.getDate()}</b>${cls}${ts}</div>`}
+ return `<h1>Lịch học</h1><div class="bar"><button class="b" data-a="cal" data-id="-1">‹</button><b style="min-width:110px;text-align:center">${title}</b><button class="b" data-a="cal" data-id="1">›</button>
+ <button class="b" data-a="cal" data-id="0">Hôm nay</button><button class="b ${wk?'':'p'}" data-a="mode" data-id="month">Tháng</button><button class="b ${wk?'p':''}" data-a="mode" data-id="week">Tuần</button></div>
+ <div class="scroll"><div class="cal" style="min-width:560px">${DAYS.map(d=>`<div class="h">${d}</div>`).join('')}${cells}</div></div>
+ <p style="color:var(--muted);font-size:13px">Thanh màu = giờ học theo thời khóa biểu; ⚑ đỏ = deadline, xanh = đã xong.</p>`;
+}
+
+/* ===== Môn học ===== */
+function vSubj(){
+ return `<h1>Môn học</h1><div class="bar"><button class="b p" data-a="addS">+ Thêm môn học</button></div>`+(S.subjects.length?S.subjects.map(s=>{
+  const m=S.sessions.filter(x=>x.subject===s.id).reduce((n,x)=>n+x.minutes,0),c=S.tasks.filter(t=>t.subject===s.id).length;
+  return `<div class="row" style="border-left:6px solid ${s.color}"><div class="m"><b>${esc(s.name)}</b><br><small>${esc(s.teacher||'—')} · ${s.credits} tín chỉ · ${s.day!==''?DAYS[s.day]+' '+esc(s.time):'Chưa xếp lịch'} · ${c} nhiệm vụ · ${hours(m)}h đã học</small>${s.note?`<div><small>📝 ${esc(s.note)}</small></div>`:''}</div>
+  <button class="b s" data-a="editS" data-id="${s.id}">Sửa</button><button class="b s d" data-a="delS" data-id="${s.id}">Xóa</button></div>`}).join(''):'<div class="empty">Chưa có môn học. Hãy thêm môn đầu tiên!</div>');
+}
+const subjFields=()=>[{k:'name',l:'Tên môn',r:1},{k:'teacher',l:'Giảng viên'},{k:'credits',l:'Số tín chỉ',t:'number',r:1,min:1},{k:'color',l:'Màu đại diện',t:'color'},
+ {k:'day',l:'Ngày học trong tuần',t:'select',o:[['','Không xếp lịch'],...DAYS.map((d,i)=>[String(i),d])]},{k:'time',l:'Giờ bắt đầu',t:'time'},{k:'note',l:'Ghi chú',t:'area'}];
+
+/* ===== Mục tiêu ===== */
+function vGoals(){
+ const tot=S.sessions.reduce((n,x)=>n+x.minutes,0);
+ return `<h1>Mục tiêu</h1><div class="bar"><button class="b p" data-a="addG">+ Thêm mục tiêu</button></div>`+(S.goals.length?S.goals.map(g=>{
+  const cur=(g.scope==='week'?weekMin():tot)/60,p=Math.min(100,Math.round(cur/g.hours*100));
+  return `<div class="card" style="margin-bottom:10px"><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b style="flex:1">${esc(g.title)}</b><span class="tag">${g.scope==='week'?'Theo tuần':'Học kỳ'}</span>
+  <button class="b s" data-a="editG" data-id="${g.id}">Sửa</button><button class="b s d" data-a="delG" data-id="${g.id}">Xóa</button></div>
+  <div class="prog"><i style="width:${p}%"></i></div><small style="color:var(--muted)">${cur.toFixed(1)} / ${g.hours} giờ (${p}%)</small></div>`}).join(''):'<div class="empty">Chưa có mục tiêu nào. Hãy đặt mục tiêu giờ học đầu tiên!</div>');
+}
+const goalFields=()=>[{k:'title',l:'Tên mục tiêu',r:1},{k:'hours',l:'Số giờ cần đạt',t:'number',r:1,min:1},{k:'scope',l:'Phạm vi',t:'select',o:[['week','Theo tuần'],['term','Theo học kỳ']]}];
+
+/* ===== Pomodoro (chạy nền, không mất khi chuyển tab) ===== */
+const P={mode:'focus',left:1500,run:false,iv:null,sub:''};
+const pLen=()=>P.mode==='focus'?1500:300;
+const mmss=s=>String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');
+function logSession(min){if(min>=1&&P.mode==='focus'){S.sessions.push({id:uid(),date:today(),minutes:min,subject:P.sub||S.subjects[0]?.id||''});save()}}
+function tick(){P.left--;if(P.left<=0){logSession(25);toast(P.mode==='focus'?'Hết 25 phút! Nghỉ 5 phút nhé ☕':'Hết giờ nghỉ, học tiếp nào 💪');P.mode=P.mode==='focus'?'break':'focus';P.left=pLen()}
+ if(view==='pomo'){if(P.left===pLen()-0||P.left<=0)render();else $('#tm').textContent=mmss(P.left)}}
+function vPomo(){
+ const td=S.sessions.filter(x=>x.date===today()).reduce((n,x)=>n+x.minutes,0);
+ const rec=[...S.sessions].reverse().slice(0,6);
+ return `<h1>Pomodoro</h1><div class="grid g2"><div class="card"><div style="text-align:center"><span class="tag ${P.mode==='focus'?'':'g'}">${P.mode==='focus'?'Tập trung 25 phút':'Nghỉ 5 phút'}</span></div><div class="timer" id="tm">${mmss(P.left)}</div>
+ <label>Môn đang học</label><select data-p="sub">${subOpts().map(o=>`<option value="${o[0]}" ${P.sub===o[0]?'selected':''}>${esc(o[1])}</option>`).join('')}</select>
+ <div class="bar" style="margin-top:14px;justify-content:center"><button class="b p" data-a="pgo">${P.run?'Tạm dừng':'Bắt đầu'}</button><button class="b" data-a="pend">Kết thúc &amp; ghi giờ</button><button class="b" data-a="prst">Đặt lại</button></div></div>
+ <div class="card"><h3>Hôm nay: ${hours(td)} giờ</h3>${rec.length?rec.map(x=>`<div style="padding:4px 0"><span class="chip" style="background:${subj(x.subject).color}">${esc(subj(x.subject).name)}</span> ${x.minutes} phút <small style="color:var(--muted)">· ${x.date}</small></div>`).join(''):'<div class="empty">Chưa có phiên học nào.</div>'}</div></div>`;
+}
+
+/* ===== Xử lý sự kiện ===== */
+const A={
+ nav:id=>{view=id;render()},
+ close:()=>$('#dlg').close(),ok:submitForm,
+ theme:()=>{const dark=matchMedia('(prefers-color-scheme: dark)').matches;const cur=S.theme||(dark?'dark':'light');S.theme=cur==='dark'?'light':'dark';save();render()},
+ export:()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:'application/json'}));a.download='studyplan-data.json';a.click()},
+ import:()=>$('#file').click(),
+ cyc:id=>{const t=S.tasks.find(x=>x.id===id);t.status={todo:'doing',doing:'done',done:'todo'}[t.status];save();render()},
+ addT:()=>openForm('Thêm nhiệm vụ',taskFields(),{subject:S.subjects[0]?.id,due:today(),priority:'mid',status:'todo'},o=>S.tasks.push({id:uid(),...o})),
+ editT:id=>{const t=S.tasks.find(x=>x.id===id);openForm('Sửa nhiệm vụ',taskFields(),t,o=>Object.assign(t,o))},
+ delT:id=>{if(confirm('Xóa nhiệm vụ này?')){S.tasks=S.tasks.filter(x=>x.id!==id);save();render()}},
+ addS:()=>openForm('Thêm môn học',subjFields(),{credits:3,color:PALETTE[S.subjects.length%5],day:'',time:'08:00'},o=>S.subjects.push({id:uid(),...o})),
+ editS:id=>{const s=S.subjects.find(x=>x.id===id);openForm('Sửa môn học',subjFields(),s,o=>Object.assign(s,o))},
+ delS:id=>{if(confirm('Xóa môn học? Nhiệm vụ liên quan sẽ bị xóa theo.')){S.subjects=S.subjects.filter(x=>x.id!==id);S.tasks=S.tasks.filter(t=>t.subject!==id);save();render()}},
+ addG:()=>openForm('Thêm mục tiêu',goalFields(),{hours:15,scope:'week'},o=>S.goals.push({id:uid(),...o})),
+ editG:id=>{const g=S.goals.find(x=>x.id===id);openForm('Sửa mục tiêu',goalFields(),g,o=>Object.assign(g,o))},
+ delG:id=>{S.goals=S.goals.filter(x=>x.id!==id);save();render()},
+ cal:id=>{const r=cal.ref;cal.ref=id==='0'?new Date():cal.mode==='week'?addD(r,7*id):new Date(r.getFullYear(),r.getMonth()+ +id,1);render()},
+ mode:id=>{cal.mode=id;render()},
+ pgo:()=>{if(!P.sub)P.sub=S.subjects[0]?.id||'';P.run=!P.run;clearInterval(P.iv);if(P.run)P.iv=setInterval(tick,1000);render()},
+ prst:()=>{P.run=false;clearInterval(P.iv);P.mode='focus';P.left=1500;render()},
+ pend:()=>{const m=Math.round((pLen()-P.left)/60);logSession(m);toast(m>=1?`Đã ghi ${m} phút học`:'Chưa đủ 1 phút để ghi nhận');A.prst()}
+};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b)A[b.dataset.a]?.(b.dataset.id)});
+document.addEventListener('input',e=>{const t=e.target;
+ if(t.id==='q'){F.q=t.value;$('#tl').innerHTML=taskList()}
+ else if(t.dataset.f){F[t.dataset.f]=t.value;$('#tl').innerHTML=taskList()}
+ else if(t.dataset.p)P.sub=t.value});
+$('#file').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.subjects||!d.tasks)throw 0;S=d;S.sessions=S.sessions||[];S.goals=S.goals||[];save();render();toast('Đã nhập dữ liệu')}catch(_){toast('File JSON không hợp lệ')}};r.readAsText(f);e.target.value=''});
+render();
+</script>
+</body>
+</html>
